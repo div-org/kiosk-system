@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Resources\UserResource;
+use App\Models\Company;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
@@ -15,7 +16,7 @@ class UserController extends Controller
     // GET /api/users
     public function index()
     {
-        $users = User::paginate(15);
+        $users = User::paginate(20);
 
         return UserResource::collection($users);
     }
@@ -38,12 +39,20 @@ class UserController extends Controller
         }
 
         $user = User::create([
-            'firstname' => $request->firstname,
-            'lastname'  => $request->lastname,
-            'email'     => $request->email,
-            'password'  => bcrypt($request->password),
-            'role_id'   => 1
+            'firstname'     => $request->firstname,
+            'lastname'      => $request->lastname,
+            'email'         => $request->email,
+            'password'      => bcrypt($request->password),
+            'role_id'       => 1,
         ]);
+
+        $company = Company::create([
+            'company_name'  => "{$request->firstname}'s Company",
+            'owner_user_id' => $user->id,
+        ]);
+        $user->company_id = $company->id;
+
+        $user->save();
 
         return response()->json([
             'message' => 'User created successfully',
@@ -55,16 +64,35 @@ class UserController extends Controller
     // GET /api/users/{user}
     public function show(User $user)
     {
-        return new UserResource($user);
+        // return new UserResource($user);
+        $user->load('store');
+        $user->load('role');
+
+        return response()->json([
+            'error' => 0,
+            'message' => '',
+            'data' => array_merge(
+                (new UserResource($user))->toArray(request()),
+                [
+                    'store' => $user->store,
+                    'role' => $user->role
+                ]
+            ),
+        ], 200);
     }
 
     // PUT/PATCH /api/users/{user}
     public function update(Request $request, User $user)
     {
         $data = $request->validate([
-            'name'     => 'sometimes|required|string|max:255',
-            'email'    => 'sometimes|required|email|unique:users,email,' . $user->id,
-            'password' => 'sometimes|required|string|min:8|confirmed'
+            'role_id'  => 'sometimes|nullable|exists:roles,id',
+            'store_id'  => 'sometimes|nullable|exists:stores,id',
+            'firstname' => 'sometimes|required|string|max:255',
+            'lastname'  => 'sometimes|required|string|max:255',
+            'email'     => 'sometimes|required|email|unique:users,email,' . $user->id,
+            'password'  => 'sometimes|required|string|min:8|confirmed',
+            'unique_id' => 'sometimes|string|max:50',
+            'pin_code'  => 'sometimes|string|max:50',
         ]);
 
         if (isset($data['password'])) {
@@ -107,6 +135,9 @@ class UserController extends Controller
 
         $user = Auth::user();
 
+        $user->load('company');
+        $user->load('role');
+
         // Generate token (Laravel Sanctum)
         $token = $user->createToken('auth_token')->plainTextToken;
 
@@ -114,7 +145,11 @@ class UserController extends Controller
             'message' => 'Login successful',
             'data' => array_merge(
                 (new UserResource($user))->toArray(request()),
-                ['token' => $token]
+                [
+                    'token' => $token,
+                    'company' => $user->company,
+                    'role' => $user->role
+                ]
             ),
             'error' => 0
         ]);
@@ -149,5 +184,41 @@ class UserController extends Controller
             ),
             'error' => 0
         ]);
+    }
+
+    // POST /api/userStore
+    public function userStore(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'firstname'     => 'required|string|max:255',
+            'lastname'      => 'required|string|max:255',
+            'email'         => 'required|email|unique:users,email',
+            'password'      => 'required|string|min:8|confirmed'
+        ]);
+        
+        if ($validator->fails()) {
+            return response()->json([
+                'message' => $validator->messages(),
+                'error' => 422,
+            ], 422);
+        }
+        
+        $userAuth = $request->user();
+
+        $user = User::create([
+            'firstname'     => $request->firstname,
+            'lastname'      => $request->lastname,
+            'email'         => $request->email,
+            'password'      => bcrypt($request->password),
+            'role_id'       => 5,
+            'company_id'    => $userAuth->company_id,
+            'store_id'      => $userAuth->store_id
+        ]);
+
+        return response()->json([
+            'message' => 'User created successfully',
+            'data' => new UserResource($user),
+            'error' => 0
+        ], 200);
     }
 }

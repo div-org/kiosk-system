@@ -4,6 +4,25 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+DROP TABLE IF EXISTS `bookings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `bookings` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) DEFAULT NULL,
+  `start_date` datetime NOT NULL,
+  `end_date` datetime NOT NULL,
+  `store_id` bigint(20) unsigned DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `bookings_store_id_foreign` (`store_id`),
+  KEY `bookings_user_id_foreign` (`user_id`),
+  CONSTRAINT `bookings_store_id_foreign` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `bookings_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `cache`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
@@ -129,6 +148,7 @@ DROP TABLE IF EXISTS `roles`;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `roles` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `level` int(11) NOT NULL,
   `name` varchar(255) NOT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
@@ -151,11 +171,70 @@ CREATE TABLE `sessions` (
   KEY `sessions_last_activity_index` (`last_activity`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `stores`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stores` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `company_id` bigint(20) unsigned NOT NULL,
+  `store_name` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `stores_company_id_foreign` (`company_id`),
+  CONSTRAINT `stores_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `tracker_breaks`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tracker_breaks` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `break_in` datetime DEFAULT NULL,
+  `break_out` datetime DEFAULT NULL,
+  `total_break` decimal(8,2) DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `store_id` bigint(20) unsigned DEFAULT NULL,
+  `company_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `tracker_breaks_user_id_foreign` (`user_id`),
+  KEY `tracker_breaks_store_id_foreign` (`store_id`),
+  KEY `tracker_breaks_company_id_foreign` (`company_id`),
+  CONSTRAINT `tracker_breaks_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `tracker_breaks_store_id_foreign` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `tracker_breaks_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `trackers`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `trackers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `time_in` datetime NOT NULL,
+  `time_out` datetime DEFAULT NULL,
+  `total_hours` decimal(8,2) DEFAULT NULL,
+  `user_id` bigint(20) unsigned DEFAULT NULL,
+  `store_id` bigint(20) unsigned DEFAULT NULL,
+  `company_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `trackers_user_id_foreign` (`user_id`),
+  KEY `trackers_store_id_foreign` (`store_id`),
+  KEY `trackers_company_id_foreign` (`company_id`),
+  CONSTRAINT `trackers_company_id_foreign` FOREIGN KEY (`company_id`) REFERENCES `companies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `trackers_store_id_foreign` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `trackers_user_id_foreign` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `store_id` bigint(20) unsigned DEFAULT NULL,
   `firstname` varchar(255) NOT NULL,
   `lastname` varchar(255) NOT NULL,
   `unique_id` varchar(50) DEFAULT NULL,
@@ -163,13 +242,19 @@ CREATE TABLE `users` (
   `company_id` bigint(20) unsigned DEFAULT NULL,
   `email` varchar(255) NOT NULL,
   `email_verified_at` timestamp NULL DEFAULT NULL,
+  `mobile_number` varchar(255) DEFAULT NULL,
   `password` varchar(255) NOT NULL,
   `remember_token` varchar(100) DEFAULT NULL,
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `role_id` bigint(20) unsigned NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `users_email_unique` (`email`),
-  UNIQUE KEY `users_unique_id_unique` (`unique_id`)
+  UNIQUE KEY `users_unique_id_unique` (`unique_id`),
+  KEY `users_role_id_foreign` (`role_id`),
+  KEY `users_store_id_foreign` (`store_id`),
+  CONSTRAINT `users_role_id_foreign` FOREIGN KEY (`role_id`) REFERENCES `roles` (`id`) ON DELETE CASCADE,
+  CONSTRAINT `users_store_id_foreign` FOREIGN KEY (`store_id`) REFERENCES `stores` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -189,3 +274,12 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (7,'2025_08_11_1835
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2025_08_23_044451_create_companies_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2025_08_25_172450_alter_unique_id_column_in_users_table',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (10,'2025_09_02_173301_add_pin_code_to_users_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (11,'2025_10_06_194908_create_stores_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (12,'2025_10_07_183936_add_level_column_on_role_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (13,'2025_10_07_185353_add_new_columns_on_user_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (14,'2025_10_15_052337_add_store_id_to_users_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (15,'2025_10_15_070437_update_store_id_foreign_on_users_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (16,'2025_10_17_151121_create_booking_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (17,'2025_10_20_100128_create_tracker_table',2);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (18,'2025_10_21_090513_create_tracker_breaks_table',3);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (19,'2025_10_21_090653_remove_breaks_on_tracker_table',3);

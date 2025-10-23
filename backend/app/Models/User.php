@@ -20,6 +20,7 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
+        'store_id',
         'firstname',
         'lastname',
         'email',
@@ -58,19 +59,6 @@ class User extends Authenticatable
         parent::boot();
 
         static::created(function (User $user) {
-            // if NOT from store, auto-create a company
-            if (!Request::boolean('fromStore')) {
-                $company = Company::create([
-                    'company_name'  => "{$user->firstname}'s Company",
-                    'owner_user_id' => $user->id,
-                ]);
-
-                $user->company_id = $company->id;
-            } else {
-                // if from store, use company_id from payload
-                // (already assigned in controller create)
-            }
-
             // generate unique_id after company_id is set
             $user->unique_id = sprintf(
                 '%s%s%s',
@@ -78,11 +66,14 @@ class User extends Authenticatable
                 $user->company_id,
                 $user->id
             );
-            
             $user->pin_code = str_pad(random_int(0, 99999999), 8, '0', STR_PAD_LEFT);
-
             $user->save();
         });
+    }
+
+    public function store()
+    {
+        return $this->belongsTo(Store::class);
     }
 
     public function company()

@@ -11,6 +11,8 @@ import PublicRoute from './PublicRoute'
 import RegisterFromStorePage from '../pages/dashboard/register-from-store/RegisterFromStorePage'
 import ManageStorePage from '../pages/dashboard/manage-store/ManageStorePage'
 import CreateStorePage from '../pages/dashboard/create-store/CreateStorePage'
+import BookingPage from '../pages/dashboard/booking/BookingPage'
+import TrackerPage from '../pages/dashboard/tracker/TrackerPage'
 
 const AppRouter = () => {
 
@@ -68,6 +70,14 @@ const AppRouter = () => {
             {
               path: 'create-store',
               element: <CreateStorePage />
+            },
+            {
+              path: 'booking',
+              element: <BookingPage />
+            },
+            {
+              path: 'tracker',
+              element: <TrackerPage />
             },
           ]
         }

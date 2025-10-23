@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useDomain } from '../../../redux/features/domain/domainSlice'
 import handleApiRequest from '../../../api/handleApiRequest'
 import { api } from '../../../api/api'
+import DataTable from '../../common/datatable/DataTable'
+import Button from '../../custom/Button'
 
 const TableStoreList = () => {
 
@@ -16,7 +18,7 @@ const TableStoreList = () => {
     const fetchData = async () => {
 
       try {
-        const url = `${domain}/${api.users}`
+        const url = `${domain}/${api.stores}`
 
         const headers = {
           Authorization: `Bearer ${localStorage.getItem('authToken')}`
@@ -36,50 +38,46 @@ const TableStoreList = () => {
 
     fetchData()
   }, [])
+
+  
+  const columns = useMemo(() => [
+    {
+      header: 'ID',
+      accessorKey: "id",
+    },
+    {
+      header: 'Store Name',
+      accessorKey: "store_name",
+    },
+    // {
+    //   header: '',
+    //   accessorKey: "actions",
+    //   enableSorting: false,
+    //   cell: ({ row }) => {
+    //     const item = row.original
+
+    //     return (
+    //       <div className="action-container">
+
+    //         <Button onClick={() => console.log(item)}>
+    //           View
+    //         </Button>
+            
+    //       </div>
+    //     )
+    //   }
+    // }
+  ], [])
   
   
   return (
     <div className="table-user-list">
-      {
-        tableData.length > 0 && (
-          <table>
-            <thead>
-              <tr>
-                <th>Email</th>
-                <th>Unique ID</th>
-                <th>PIN Code</th>
-                <th>First Name</th>
-                <th>Last Name</th>
-                <th>Created At</th>
-              </tr>
-            </thead>
-            <tbody>
-              {
-                tableData.map(item => {
-                  const { id, email, firstname, lastname, created_at, unique_id, pin_code } = item
-
-                  return (
-                    <tr
-                      key={id}
-                    >
-                      <td>{email}</td>
-                      <td>{unique_id}</td>
-                      <td>{pin_code}</td>
-                      <td>{firstname}</td>
-                      <td>{lastname}</td>
-                      <td>{created_at}</td>
-                    </tr>
-                  )
-                })
-              }
-            </tbody>
-          </table>
-        )
-      }
-
-      <div className="page-control">
-        
-      </div>
+      
+      <DataTable
+        columns={columns}
+        data={tableData}
+      />
+      
     </div>
   )
 }

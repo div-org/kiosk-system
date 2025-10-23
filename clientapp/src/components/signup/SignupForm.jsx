@@ -35,7 +35,7 @@ const SignupForm = ({
     // Handle form submission logic here
 
     try {
-      const url = `${domain}/${api.users}`;
+      const url = storePage ? `${domain}/${api.userStore}` : `${domain}/${api.users}`;
 
       let payload = {
         firstname,
@@ -54,7 +54,16 @@ const SignupForm = ({
         };
       }
 
-      const res = await handleApiRequest({ method: 'POST', url, payload });
+      const headers = {
+        Authorization: `Bearer ${localStorage.getItem('authToken')}`
+      }
+
+      const res = await handleApiRequest({ 
+        method: 'POST',
+        url,
+        headers: storePage ? headers : {},
+        payload
+      });
       
       const { data, message, error } = res;
 

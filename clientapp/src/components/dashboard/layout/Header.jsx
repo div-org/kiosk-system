@@ -30,6 +30,8 @@ const Header = () => {
         <div className="header-navigation-wrapper">
           <NavLink to='/dashboard'>Home</NavLink>
           <NavLink to='/dashboard/manage-store'>Manage Store</NavLink>
+          <NavLink to='/dashboard/booking'>Booking</NavLink>
+          <NavLink to='/dashboard/tracker'>Tracker</NavLink>
         </div>
 
         <div className="btn-container">          

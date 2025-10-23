@@ -3,8 +3,12 @@ import { useDomain } from '../../../redux/features/domain/domainSlice'
 import handleApiRequest from '../../../api/handleApiRequest'
 import { api } from '../../../api/api'
 import DataTable from '../../common/datatable/DataTable'
+import Button from '../../custom/Button'
 
-const TableUserList = () => {
+const TableUserList = ({
+  selectedRow = null,
+  setSelectedRow = () => {}
+}) => {
 
   
   const domain = useDomain()
@@ -63,6 +67,26 @@ const TableUserList = () => {
       header: 'Pin Code',
       accessorKey: "pin_code",
     },
+    {
+      header: '',
+      accessorKey: "actions",
+      enableSorting: false,
+      cell: ({ row }) => {
+        const item = row.original
+
+        return (
+          <div className="action-container">
+
+            <Button
+              onClick={() => setSelectedRow(item)}
+            >
+              View
+            </Button>
+            
+          </div>
+        )
+      }
+    }
   ], [])
   
   return (
