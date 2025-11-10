@@ -14,9 +14,12 @@ use Laravel\Sanctum\PersonalAccessToken;
 class UserController extends Controller
 {
     // GET /api/users
-    public function index()
+    public function index(Request $request)
     {
-        $users = User::paginate(20);
+        $userAuth = $request->user();
+
+        $users = User::where('company_id', $userAuth->company_id)
+            ->paginate(20);
 
         return UserResource::collection($users);
     }

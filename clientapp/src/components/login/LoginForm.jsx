@@ -11,6 +11,7 @@ import { Link } from 'react-router-dom';
 import { formatLoginData } from '../../redux/features/login/loginUtils';
 import { validMail } from '../../utils/helper';
 import InputGroup from '../custom/input/InputGroup';
+import Loader from '../loader/Loader';
 
 const initialState = {
   email: '',
@@ -54,6 +55,8 @@ const LoginForm = () => {
     if (Object.values(newErrors).length > 0) {
       return
     }
+
+    setIsLoading(true)
 
     try {
       setIsLoading(true)
@@ -100,6 +103,10 @@ const LoginForm = () => {
   
   return (
     <div className='login-container'>
+
+      <Loader
+        isLoading={isLoading}
+      />
       
       <form className='login-form' onSubmit={handleSubmit}>
 

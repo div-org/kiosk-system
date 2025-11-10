@@ -27,7 +27,7 @@ const DashboardPage = () => {
               <Button
                 onClick={() => navigate('/dashboard/register-from-store')}
               >
-                Register from Store
+                Create User
               </Button>
             </>
           }

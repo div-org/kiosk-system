@@ -18,6 +18,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('roles', RoleController::class);
     // Route::apiResource('trackers', TrackerController::class);
 
+    // User routes
+    Route::get('users', [UserController::class, 'index']);
+
     // Tracker routes
     Route::get('trackers', [TrackerController::class, 'index']);
     Route::post('trackers/clockTrack', [TrackerController::class, 'clockTrack']);

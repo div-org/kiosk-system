@@ -7,6 +7,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { alertType, showGlobalAlertModal } from '../../redux/features/global-alert/globalAlertSlice';
 import InputGroup from '../custom/input/InputGroup';
+import Loader from '../loader/Loader';
 
 const initialState = {
   firstname: '',
@@ -26,6 +27,7 @@ const SignupForm = ({
   const domain = useDomain()
 
   const [values, setValues] = useState(initialState);
+  const [isLoading, setIsLoading] = useState(false);
 
   const { firstname, lastname, email, password, password_confirmation } = values;
   
@@ -33,6 +35,8 @@ const SignupForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
     // Handle form submission logic here
+
+    setIsLoading(true)
 
     try {
       const url = storePage ? `${domain}/${api.userStore}` : `${domain}/${api.users}`;
@@ -82,6 +86,8 @@ const SignupForm = ({
     } catch (error) { 
       console.log(error)
       dispatch(showGlobalAlertModal({ message: JSON.stringify(error.response.data.message), type: alertType.error }))
+    } finally {
+      setIsLoading(false)
     }
   }
 
@@ -96,11 +102,17 @@ const SignupForm = ({
   
   return (
     <div className='signup-container'>
+
+      <Loader
+        isLoading={isLoading}
+      />
       
       <form className='signup-form' onSubmit={handleSubmit}>
 
         <div className="logo-container">
-          <h1>{storePage ? 'Register From Store' : 'DIV KIOSK SIGNUP'}</h1>
+          <h1>
+            {storePage ? 'Register From Store' : 'DIV KIOSK SIGNUP'}
+          </h1>
         </div>
         
         <InputGroup

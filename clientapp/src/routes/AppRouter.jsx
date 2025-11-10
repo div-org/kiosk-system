@@ -60,6 +60,10 @@ const AppRouter = () => {
               )
             },
             {
+              path: 'create-user',
+              element: <RegisterFromStorePage />
+            },
+            {
               path: 'register-from-store',
               element: <RegisterFromStorePage />
             },
