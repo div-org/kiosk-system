@@ -12,6 +12,9 @@ import { formatLoginData } from '../../redux/features/login/loginUtils';
 import { validMail } from '../../utils/helper';
 import InputGroup from '../custom/input/InputGroup';
 import Loader from '../loader/Loader';
+import ContainerLoader from '../loader/ContainerLoader';
+import { FcGoogle } from 'react-icons/fc';
+import Linear from '../common/Linear';
 
 const initialState = {
   email: '',
@@ -104,60 +107,81 @@ const LoginForm = () => {
   return (
     <div className='login-container'>
 
-      <Loader
-        isLoading={isLoading}
-      />
-      
-      <form className='login-form' onSubmit={handleSubmit}>
+      <div className="login-form-wrapper">
 
-        <div className="login-message">
-          <h1>Welcome Back!</h1>
-          <p>Please enter your details.</p>
-        </div>
+        <form className='login-form' onSubmit={handleSubmit}>
 
-        <InputGroup
-          label='Email'
-          type="email"
-          value={email}
-          onChange={e => changeValue(e, 'email')}
-          disabled={isLoading}
-        />
-
-        <InputGroup
-          label='Password'
-          type="password"
-          value={password}
-          onChange={e => changeValue(e, 'password')}
-          disabled={isLoading}
-        />
-
-
-        <div className="action-container">
-          <Checkbox 
-            label='Remember me'
-            id='remember-me'
-            name='remember-me'
+          <ContainerLoader
+            isLoading={isLoading}
           />
 
-          <Link to="/forgot-password">Forgot Password?</Link>
-        </div>
+          <div className="login-message">
+            <h1>Welcome Back!</h1>
+            <p>Please enter your details.</p>
+          </div>
 
-
-        <div className="btn-container">
-          <Button 
-            type="submit"
+          <InputGroup
+            label='Email'
+            type='email'
+            value={email}
+            onChange={e => changeValue(e, 'email')}
             disabled={isLoading}
-          >
-            Login
-          </Button>
-        </div>
+            placeholder='Enter your Email'
+          />
+
+          <InputGroup
+            label='Password'
+            type='password'
+            value={password}
+            onChange={e => changeValue(e, 'password')}
+            disabled={isLoading}
+            placeholder='Enter Password'
+          />
 
 
-        <div className="to-sign-up">
-          <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
-        </div>
+          <div className="action-container">
+            <Checkbox 
+              label='Remember me'
+              id='remember-me'
+              name='remember-me'
+            />
 
-      </form>
+            <Link to="/forgot-password">Forgot Password?</Link>
+          </div>
+
+
+          <div className="btn-container">
+            <Button 
+              type="submit"
+              disabled={isLoading}
+            >
+              Sign In
+            </Button>
+
+            <Linear text='or' />
+
+            <Button
+              variant='white'
+              className='btn-google'
+            >
+              <FcGoogle />
+              Sign In with Google
+            </Button>
+          </div>
+
+
+          <div className="to-sign-up">
+            <p>Don't have an account? <Link to="/signup">Sign Up</Link></p>
+          </div>
+
+        </form>
+        
+      </div>
+      
+
+      <div className="right-content">
+
+      </div>
       
     </div>
   )

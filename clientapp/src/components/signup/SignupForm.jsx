@@ -8,6 +8,9 @@ import { useDispatch } from 'react-redux';
 import { alertType, showGlobalAlertModal } from '../../redux/features/global-alert/globalAlertSlice';
 import InputGroup from '../custom/input/InputGroup';
 import Loader from '../loader/Loader';
+import ContainerLoader from '../loader/ContainerLoader';
+import { FcGoogle } from 'react-icons/fc';
+import Linear from '../common/Linear';
 
 const initialState = {
   firstname: '',
@@ -83,8 +86,14 @@ const SignupForm = ({
         dispatch(showGlobalAlertModal({ message: JSON.stringify(message), type: alertType.error }))
       }
       console.log(res)
-    } catch (error) { 
+    } catch (error) {
       console.log(error)
+
+      if (error.code) {
+        dispatch(showGlobalAlertModal({ message: error.message, type: alertType.error }))
+        return
+      }
+      
       dispatch(showGlobalAlertModal({ message: JSON.stringify(error.response.data.message), type: alertType.error }))
     } finally {
       setIsLoading(false)
@@ -102,65 +111,109 @@ const SignupForm = ({
   
   return (
     <div className='signup-container'>
-
-      <Loader
-        isLoading={isLoading}
-      />
       
       <form className='signup-form' onSubmit={handleSubmit}>
+
+        <ContainerLoader
+          isLoading={isLoading}
+        />
 
         <div className="logo-container">
           <h1>
             {storePage ? 'Register From Store' : 'DIV KIOSK SIGNUP'}
           </h1>
         </div>
-        
-        <InputGroup
-          label="First Name"
-          type="firstname"
-          value={firstname}
-          onChange={e => changeValue(e, 'firstname')}
-        />
 
-        <InputGroup
-          label="Last Name"
-          type="lastname"
-          value={lastname}
-          onChange={e => changeValue(e, 'lastname')}
-        />
+        <div className="row-w">
+
+          <div className="col-h">
+        
+            <InputGroup
+              label='First Name'
+              type='firstname'
+              value={firstname}
+              onChange={e => changeValue(e, 'firstname')}
+              placeholder='Enter your First Name'
+            />
+
+          </div>
+
+
+          <div className="col-h">
+
+            <InputGroup
+              label="Last Name"
+              type="lastname"
+              value={lastname}
+              onChange={e => changeValue(e, 'lastname')}
+              placeholder='Enter your Last Name'
+            />
+
+          </div>
+
+        </div>
 
         <InputGroup
           label="Email"
           type="email"
           value={email}
           onChange={e => changeValue(e, 'email')}
+          placeholder='Enter Email'
         />
 
         {
           !storePage && 
-          <>
-            <InputGroup
-              label="Password"
-              type="password"
-              value={password}
-              onChange={e => changeValue(e, 'password')}
-            />
+          <div className="row-w">
 
-            <InputGroup
-              label="Password Confirmation"
-              type="password"
-              value={password_confirmation}
-              onChange={e => changeValue(e, 'password_confirmation')}
-            />
-          </>
+            <div className='col-h'>
+
+              <InputGroup
+                label="Password"
+                type="password"
+                value={password}
+                onChange={e => changeValue(e, 'password')}
+                placeholder='Enter your Password'
+              />
+
+            </div>
+            
+
+            <div className="col-h">
+
+              <InputGroup
+                label="Password Confirmation"
+                type="password"
+                value={password_confirmation}
+                onChange={e => changeValue(e, 'password_confirmation')}
+                placeholder='Enter your Password'
+              />
+
+            </div>
+
+          </div>
         }
 
-        <Button type="submit">Sign Up</Button>
+        <div className="btn-container">
+
+          <Button type="submit">Sign Up</Button>
+
+          <Linear text='or' />
+
+          <Button
+            variant='white'
+            className='btn-google'
+          >
+            <FcGoogle />
+            Sign Up with Google
+          </Button>
+
+        </div>
+
 
         {
           !storePage &&
           <div className="to-login">
-            <p>Already have an account? <Link to='/login'>Login</Link></p>
+            <p>Already have an account? <Link to='/login'>Sign In</Link></p>
           </div>
         }
 

@@ -11,7 +11,13 @@ const SignupPage = () => {
 
       <div className="page-content">
 
-        <SignupForm />
+        <div className="page-wrapper">
+
+          <SignupForm />
+
+          <div className="right-content"></div>
+
+        </div>
         
       </div>
       
