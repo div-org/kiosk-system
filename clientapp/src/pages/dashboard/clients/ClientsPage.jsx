@@ -6,7 +6,7 @@ import { useLoginData } from '../../../redux/features/login/loginSlice';
 import { useState } from 'react';
 import SelectedUserModal from '../../../components/dashboard/home/SelectedUserModal';
 
-const DashboardPage = () => {
+const ClientsPage = () => {
 
   const { company = {} } = useLoginData();
   const { company_name = '' } = company;
@@ -17,13 +17,25 @@ const DashboardPage = () => {
 
   return (
     <>
-    
       <div className='dashboard-page'>
 
+        <TableUserList
+          selectedRow={selectedRow}
+          setSelectedRow={setSelectedRow}
+        />
+        
       </div>
+
+      {
+        selectedRow &&
+        <SelectedUserModal
+          selectedRow={selectedRow}
+          onHide={() => setSelectedRow(null)}
+        />
+      }
 
     </>
   )
 }
 
-export default DashboardPage
+export default ClientsPage

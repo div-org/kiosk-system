@@ -13,6 +13,7 @@ import ManageStorePage from '../pages/dashboard/manage-store/ManageStorePage'
 import CreateStorePage from '../pages/dashboard/create-store/CreateStorePage'
 import BookingPage from '../pages/dashboard/booking/BookingPage'
 import TrackerPage from '../pages/dashboard/tracker/TrackerPage'
+import ClientsPage from '../pages/dashboard/clients/ClientsPage'
 
 const AppRouter = () => {
 
@@ -83,6 +84,10 @@ const AppRouter = () => {
               path: 'tracker',
               element: <TrackerPage />
             },
+            {
+              path: 'clients',
+              element: <ClientsPage />
+            }
           ]
         }
       ]
